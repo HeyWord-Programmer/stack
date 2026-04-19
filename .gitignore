@@ -1,0 +1,11 @@
+node_modules/
+uploads/
+certs/
+*.db
+*.db-shm
+*.db-wal
+.env
+.DS_Store
+*.log
+.vscode/
+.idea/

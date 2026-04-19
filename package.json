@@ -1,0 +1,25 @@
+{
+  "name": "stack-messenger",
+  "version": "1.0.0",
+  "description": "Stack — Private and secure messenger for children and adults",
+  "main": "server/server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server/server.js",
+    "dev": "node --watch server/server.js",
+    "gen-cert": "mkdir -p certs && openssl req -x509 -newkey rsa:2048 -nodes -keyout certs/key.pem -out certs/cert.pem -days 365 -subj '/CN=localhost' -addext 'subjectAltName=DNS:localhost,IP:127.0.0.1'",
+    "start:https": "STACK_SSL_CERT=certs/cert.pem STACK_SSL_KEY=certs/key.pem node server/server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.1",
+    "ws": "^8.18.0",
+    "better-sqlite3": "^11.3.0",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^1.4.5-lts.1",
+    "cors": "^2.8.5"
+  },
+  "keywords": ["messenger", "chat", "websocket", "secure"],
+  "author": "Stack Team",
+  "license": "MIT"
+}

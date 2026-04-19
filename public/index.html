@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#19ff00">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Stack">
+<title>Stack — Приватный мессенджер</title>
+<link rel="manifest" href="/manifest.json">
+<link rel="icon" type="image/svg+xml" href="/icon-192.svg">
+<link rel="apple-touch-icon" href="/icon-192.svg">
+<link rel="stylesheet" href="styles.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- ============ ЗАГРУЗОЧНЫЙ ЭКРАН ============ -->
+<div id="splash" class="splash">
+  <div class="splash-logo">
+    <div class="logo-mark">
+      <div class="logo-layer l1"></div>
+      <div class="logo-layer l2"></div>
+      <div class="logo-layer l3"></div>
+    </div>
+    <h1 class="splash-title">Stack</h1>
+    <p class="splash-sub">Приватно. Безопасно. Просто.</p>
+  </div>
+</div>
+
+<!-- ============ АВТОРИЗАЦИЯ ============ -->
+<div id="auth-screen" class="auth-screen hidden">
+  <div class="auth-container">
+    <div class="auth-brand">
+      <div class="logo-mark small">
+        <div class="logo-layer l1"></div>
+        <div class="logo-layer l2"></div>
+        <div class="logo-layer l3"></div>
+      </div>
+      <span class="brand-name">Stack</span>
+    </div>
+
+    <!-- Вход -->
+    <div id="login-form" class="auth-form">
+      <h2>С возвращением</h2>
+      <p class="auth-sub">Войдите в свой аккаунт Stack</p>
+      <label>
+        <span>Номер телефона или @username</span>
+        <input type="text" id="login-id" placeholder="+7 999 123 45 67" autocomplete="username">
+      </label>
+      <label>
+        <span>Пароль</span>
+        <input type="password" id="login-pass" placeholder="Введите пароль" autocomplete="current-password">
+      </label>
+      <button class="btn-primary" onclick="App.login()">Войти</button>
+      <div class="auth-switch">
+        Нет аккаунта? <a onclick="App.showRegister()">Зарегистрироваться</a>
+      </div>
+      <div class="security-badge">
+        <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
+        End-to-end шифрование
+      </div>
+    </div>
+
+    <!-- Регистрация -->
+    <div id="register-form" class="auth-form hidden">
+      <h2>Создайте аккаунт</h2>
+      <p class="auth-sub">Stack заботится о вашей безопасности</p>
+      <label>
+        <span>Имя</span>
+        <input type="text" id="reg-name" placeholder="Как вас зовут?">
+      </label>
+      <label>
+        <span>Username</span>
+        <input type="text" id="reg-username" placeholder="@username">
+      </label>
+      <label>
+        <span>Дата рождения</span>
+        <input type="date" id="reg-birth">
+        <small class="hint">Необходимо для защиты несовершеннолетних</small>
+      </label>
+      <label>
+        <span>Номер телефона</span>
+        <input type="tel" id="reg-phone" placeholder="+7 999 123 45 67">
+      </label>
+      <label>
+        <span>Пароль</span>
+        <input type="password" id="reg-pass" placeholder="Минимум 6 символов">
+      </label>
+      <label class="checkbox">
+        <input type="checkbox" id="reg-agree">
+        <span>Я принимаю <a>Правила сообщества</a> и <a>Политику конфиденциальности</a></span>
+      </label>
+      <button class="btn-primary" onclick="App.register()">Создать аккаунт</button>
+      <div class="auth-switch">
+        Уже есть аккаунт? <a onclick="App.showLogin()">Войти</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ ОСНОВНОЙ ИНТЕРФЕЙС ============ -->
+<div id="main-app" class="main-app hidden">
+
+  <!-- БОКОВАЯ ПАНЕЛЬ -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <button class="icon-btn menu-btn" onclick="App.toggleMenu()">
+        <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+      </button>
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <input type="text" id="search-input" placeholder="Поиск" oninput="App.searchChats(this.value)">
+      </div>
+    </div>
+
+    <!-- Предупреждение безопасности для детей -->
+    <div id="safety-banner" class="safety-banner hidden">
+      <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
+      <div>
+        <strong>Режим защиты</strong>
+        <span>Общение со взрослыми ограничено</span>
+      </div>
+    </div>
+
+    <div class="chat-list" id="chat-list"></div>
+
+    <!-- Выпадающее меню -->
+    <div id="side-menu" class="side-menu hidden">
+      <div class="menu-profile" id="menu-profile"></div>
+      <div class="menu-items">
+        <div class="menu-item" onclick="App.showView('profile')">
+          <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M12 4a4 4 0 0 1 4 4 4 4 0 0 1-4 4 4 4 0 0 1-4-4 4 4 0 0 1 4-4m0 10c4.42 0 8 1.79 8 4v2H4v-2c0-2.21 3.58-4 8-4z"/></svg>
+          Мой профиль
+        </div>
+        <div class="menu-item" onclick="App.showView('contacts')">
+          <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M16 17v2H2v-2s0-4 7-4 7 4 7 4m-3.5-9.5A3.5 3.5 0 0 0 9 4a3.5 3.5 0 0 0-3.5 3.5A3.5 3.5 0 0 0 9 11a3.5 3.5 0 0 0 3.5-3.5m3.44 5.5A5.32 5.32 0 0 1 18 17v2h4v-2s0-3.63-6.06-4M15 4a3.39 3.39 0 0 0-1.93.59 5 5 0 0 1 0 5.82A3.39 3.39 0 0 0 15 11a3.5 3.5 0 0 0 0-7z"/></svg>
+          Контакты
+        </div>
+        <div class="menu-item" onclick="App.showView('new-chat')">
+          <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M12 3A9 9 0 0 0 3 12a9 9 0 0 0 9 9 9 9 0 0 0 9-9 9 9 0 0 0-9-9m4 10h-3v3h-2v-3H8v-2h3V8h2v3h3v2z"/></svg>
+          Новый чат
+        </div>
+        <div class="menu-item" onclick="App.showView('new-group')">
+          <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M12 5.5A3.5 3.5 0 0 1 15.5 9a3.5 3.5 0 0 1-3.5 3.5A3.5 3.5 0 0 1 8.5 9 3.5 3.5 0 0 1 12 5.5M5 8c.56 0 1.08.15 1.53.42-.15 1.43.27 2.85 1.13 3.96C7.16 13.34 6.16 14 5 14a3 3 0 0 1-3-3 3 3 0 0 1 3-3m14 0a3 3 0 0 1 3 3 3 3 0 0 1-3 3c-1.16 0-2.16-.66-2.66-1.62a5.54 5.54 0 0 0 1.13-3.96c.45-.27.97-.42 1.53-.42M5.5 18.25c0-2.07 2.91-3.75 6.5-3.75s6.5 1.68 6.5 3.75V20h-13v-1.75M0 20v-1.5c0-1.39 1.89-2.56 4.45-2.9-.59.68-.95 1.62-.95 2.65V20H0m24 0h-3.5v-1.75c0-1.03-.36-1.97-.95-2.65 2.56.34 4.45 1.51 4.45 2.9V20z"/></svg>
+          Новая группа
+        </div>
+        <div class="menu-item" onclick="App.showView('parental')">
+          <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
+          Родительский контроль
+          <span class="badge-mini" id="parental-badge">Off</span>
+        </div>
+        <div class="menu-item" onclick="App.showView('reports')">
+          <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+          Репорты
+        </div>
+        <div class="menu-item" onclick="App.showView('settings')">
+          <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M12 15.5A3.5 3.5 0 0 1 8.5 12A3.5 3.5 0 0 1 12 8.5a3.5 3.5 0 0 1 3.5 3.5 3.5 3.5 0 0 1-3.5 3.5m7.43-2.53c.04-.32.07-.64.07-.97 0-.33-.03-.66-.07-1l2.11-1.63c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.31-.61-.22l-2.49 1c-.52-.39-1.06-.73-1.69-.98l-.37-2.65A.506.506 0 0 0 14 2h-4c-.25 0-.46.18-.5.42l-.37 2.65c-.63.25-1.17.59-1.69.98l-2.49-1c-.22-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64L4.57 11c-.04.34-.07.67-.07 1 0 .33.03.65.07.97l-2.11 1.66c-.19.15-.25.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1.01c.52.4 1.06.74 1.69.99l.37 2.65c.04.24.25.42.5.42h4c.25 0 .46-.18.5-.42l.37-2.65c.63-.26 1.17-.59 1.69-.99l2.49 1.01c.22.08.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.66z"/></svg>
+          Настройки
+        </div>
+        <div class="menu-item danger" onclick="App.logout()">
+          <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M14.08 15.59L16.67 13H7v-2h9.67l-2.59-2.59L15.5 7l5 5-5 5-1.42-1.41M19 3a2 2 0 0 1 2 2v4.67l-2-2V5H5v14h14v-2.67l2-2V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14z"/></svg>
+          Выйти
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ОБЛАСТЬ ЧАТА -->
+  <main class="chat-area">
+    <!-- Заглушка когда чат не выбран -->
+    <div id="chat-empty" class="chat-empty">
+      <div class="empty-icon">
+        <div class="logo-mark">
+          <div class="logo-layer l1"></div>
+          <div class="logo-layer l2"></div>
+          <div class="logo-layer l3"></div>
+        </div>
+      </div>
+      <h3>Выберите чат</h3>
+      <p>Или начните новое общение</p>
+    </div>
+
+    <!-- Активный чат -->
+    <div id="chat-active" class="chat-active hidden">
+      <header class="chat-header">
+        <button class="icon-btn back-btn" onclick="App.closeChat()">
+          <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+        </button>
+        <div class="chat-header-info" id="chat-header-info"></div>
+        <div class="chat-header-actions">
+          <button class="icon-btn" title="Видеозвонок" onclick="App.startCall('video')">
+            <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M17 10.5V7a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-3.5l4 4v-11l-4 4z"/></svg>
+          </button>
+          <button class="icon-btn" title="Звонок" onclick="App.startCall('audio')">
+            <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M6.62 10.79a15.15 15.15 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.02-.24 11.36 11.36 0 0 0 3.57.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1.02l-2.2 2.2z"/></svg>
+          </button>
+          <button class="icon-btn" title="Ещё" onclick="App.toggleChatMenu()">
+            <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M12 16a2 2 0 0 1 2 2 2 2 0 0 1-2 2 2 2 0 0 1-2-2 2 2 0 0 1 2-2m0-6a2 2 0 0 1 2 2 2 2 0 0 1-2 2 2 2 0 0 1-2-2 2 2 0 0 1 2-2m0-6a2 2 0 0 1 2 2 2 2 0 0 1-2 2 2 2 0 0 1-2-2 2 2 0 0 1 2-2z"/></svg>
+          </button>
+          <div id="chat-menu" class="chat-menu hidden">
+            <div class="menu-item" onclick="App.muteChat()">Отключить уведомления</div>
+            <div class="menu-item" onclick="App.clearHistory()">Очистить историю</div>
+            <div class="menu-item" onclick="App.blockUser()">Заблокировать</div>
+            <div class="menu-item danger" onclick="App.openReport()">Пожаловаться</div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Ограничение общения -->
+      <div id="restriction-banner" class="restriction-banner hidden"></div>
+
+      <div class="messages" id="messages"></div>
+
+      <div id="chat-composer" class="composer">
+        <button class="icon-btn" title="Вложение" onclick="App.attachFile()">
+          <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M16.5 6v11.5a4 4 0 0 1-4 4 4 4 0 0 1-4-4V5a2.5 2.5 0 0 1 2.5-2.5A2.5 2.5 0 0 1 13.5 5v10.5a1 1 0 0 1-1 1 1 1 0 0 1-1-1V6H10v9.5a2.5 2.5 0 0 0 2.5 2.5 2.5 2.5 0 0 0 2.5-2.5V5a4 4 0 0 0-4-4 4 4 0 0 0-4 4v12.5a5.5 5.5 0 0 0 5.5 5.5 5.5 5.5 0 0 0 5.5-5.5V6h-1.5z"/></svg>
+        </button>
+        <div class="input-wrap">
+          <textarea id="message-input" placeholder="Сообщение" rows="1" onkeydown="App.handleKey(event)" oninput="App.autoResize(this)"></textarea>
+          <button class="icon-btn emoji-btn" onclick="App.toggleEmoji()">
+            <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/></svg>
+          </button>
+        </div>
+        <button class="icon-btn send-btn" id="send-btn" onclick="App.sendMessage()">
+          <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M2 21L23 12L2 3v7l15 2-15 2v7z"/></svg>
+        </button>
+
+        <!-- Панель эмодзи -->
+        <div id="emoji-panel" class="emoji-panel hidden"></div>
+
+        <!-- Меню вложений -->
+        <div id="attach-menu" class="attach-menu hidden">
+          <div class="attach-item" onclick="App.sendAttachment('photo')">
+            <div class="attach-icon" style="background:#4CAF50">📷</div>
+            <span>Фото</span>
+          </div>
+          <div class="attach-item" onclick="App.sendAttachment('video')">
+            <div class="attach-icon" style="background:#F44336">🎬</div>
+            <span>Видео</span>
+          </div>
+          <div class="attach-item" onclick="App.sendAttachment('file')">
+            <div class="attach-icon" style="background:#2196F3">📄</div>
+            <span>Файл</span>
+          </div>
+          <div class="attach-item" onclick="App.sendAttachment('voice')">
+            <div class="attach-icon" style="background:#FF9800">🎤</div>
+            <span>Голос</span>
+          </div>
+          <div class="attach-item" onclick="App.sendAttachment('location')">
+            <div class="attach-icon" style="background:#9C27B0">📍</div>
+            <span>Локация</span>
+          </div>
+          <div class="attach-item" onclick="App.sendAttachment('contact')">
+            <div class="attach-icon" style="background:#00BCD4">👤</div>
+            <span>Контакт</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Прочие вьюшки (профиль, настройки, и т.д.) -->
+    <div id="view-container" class="view-container hidden"></div>
+  </main>
+</div>
+
+<!-- ============ МОДАЛКИ ============ -->
+
+<!-- Репорт -->
+<div id="report-modal" class="modal hidden">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Пожаловаться</h3>
+      <button class="icon-btn" onclick="App.closeModal('report-modal')">
+        <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12z"/></svg>
+      </button>
+    </div>
+    <p class="modal-desc">Выберите причину — мы рассмотрим в течение 24 часов</p>
+    <div class="report-reasons">
+      <label class="radio-item"><input type="radio" name="reason" value="spam"><span>Спам или реклама</span></label>
+      <label class="radio-item"><input type="radio" name="reason" value="abuse"><span>Оскорбления / травля</span></label>
+      <label class="radio-item"><input type="radio" name="reason" value="adult"><span>Неприемлемый контент</span></label>
+      <label class="radio-item"><input type="radio" name="reason" value="grooming"><span>Груминг / опасное поведение</span></label>
+      <label class="radio-item"><input type="radio" name="reason" value="fraud"><span>Мошенничество</span></label>
+      <label class="radio-item"><input type="radio" name="reason" value="other"><span>Другое</span></label>
+    </div>
+    <textarea id="report-details" placeholder="Подробности (опционально)" rows="3"></textarea>
+    <div class="modal-actions">
+      <button class="btn-ghost" onclick="App.closeModal('report-modal')">Отмена</button>
+      <button class="btn-primary" onclick="App.submitReport()">Отправить жалобу</button>
+    </div>
+  </div>
+</div>
+
+<!-- Уведомление -->
+<div id="toast" class="toast hidden"></div>
+
+<!-- Звонок -->
+<div id="call-screen" class="call-screen hidden">
+  <div class="call-videos">
+    <video id="call-remote-video" class="call-remote-video" autoplay playsinline></video>
+  </div>
+  <video id="call-local-video" class="call-local-video" autoplay playsinline muted></video>
+  <div class="call-avatar" id="call-avatar"></div>
+  <h2 id="call-name"></h2>
+  <p id="call-status">Соединение...</p>
+  <div class="call-controls" style="position:relative;z-index:10;">
+    <button class="call-btn mute" onclick="App.toggleMute()"><svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3m7 9a7 7 0 0 1-7 7 7 7 0 0 1-7-7H3a9 9 0 0 0 8 8.94V22h2v-2.06A9 9 0 0 0 21 11h-2z"/></svg></button>
+    <button class="call-btn end" onclick="App.endCall()"><svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M12 9c-1.6 0-3.15.25-4.6.72v3.1c0 .39-.23.74-.56.9-.98.49-1.87 1.12-2.66 1.85-.18.18-.43.28-.7.28a.96.96 0 0 1-.7-.3L.29 13.08a.99.99 0 0 1-.29-.7c0-.28.11-.53.29-.71C3.34 8.78 7.46 7 12 7s8.66 1.78 11.71 4.67c.18.18.29.43.29.71 0 .28-.11.53-.29.71l-2.48 2.48a.96.96 0 0 1-.7.3c-.27 0-.52-.11-.7-.28a11.9 11.9 0 0 0-2.67-1.85.996.996 0 0 1-.56-.9v-3.1C15.15 9.25 13.6 9 12 9z"/></svg></button>
+    <button class="call-btn video" onclick="App.toggleVideo()"><svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M17 10.5V7a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-3.5l4 4v-11l-4 4z"/></svg></button>
+  </div>
+</div>
+
+<script src="api.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: stack-messenger
+    runtime: node
+    plan: free
+    region: frankfurt
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_VERSION
+        value: 22.19.0
+      - key: STACK_JWT_SECRET
+        generateValue: true
