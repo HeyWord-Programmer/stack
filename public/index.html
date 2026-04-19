@@ -130,6 +130,9 @@
 
     <!-- Выпадающее меню -->
     <div id="side-menu" class="side-menu hidden">
+      <button class="side-menu-back" onclick="App.toggleMenu()" aria-label="Назад">
+        <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </button>
       <div class="menu-profile" id="menu-profile"></div>
       <div class="menu-items">
         <div class="menu-item" onclick="App.showView('profile')">
